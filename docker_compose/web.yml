@@ -1,0 +1,35 @@
+version: '3'
+services:
+  mariadb:
+    container_name: mdb
+    image: linuxserver/mariadb
+    environment:
+      - TZ=America/New_York
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=""
+    ports:
+      # digital ocean port
+      - 51973:3306
+    volumes:
+      - /docker/config/mariadb:/config
+    restart: unless-stopped
+  phpmyadmin:
+    container_name: myadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - TZ=America/New_York
+      - PUID=1000
+      - PGID=1000
+      - PMA_HOST=mdb
+      - PMA_PORT=3306
+      - PMA_ABSOLUTE_URI=
+      - UPLOAD_LIMIT=128M
+    links:
+      - "mariadb:mdb"
+    ports:
+      - 8080:80
+    volumes:
+      - /docker/config/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+      - /docker/config/phpmyadmin/upload.ini:/usr/local/etc/php/php.ini
+    restart: unless-stopped
