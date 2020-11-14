@@ -1,0 +1,33 @@
+version: '3'
+services:
+  ouroboros:
+    container_name: ouroboros
+    image: pyouroboros/ouroboros
+    environment:
+      - TZ=America/New_York
+      - SELF_UPDATE=true
+      - CLEANUP=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+  dnsrobocert:
+    container_name: dnsrobocert
+    image:  adferrand/dnsrobocert
+    environment:
+      - CERTS_GROUP_OWNER=
+      - CERTS_GROUP_GROUP=
+    volumes:
+      - /docker/config/dnsrobocert:/etc/dnsrobocert
+      - /docker/config/letsencrypt:/etc/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+  ddclient:
+    container_name: ddclient
+    image: linuxserver/ddclient
+    environment:
+      - TZ=America/New_York
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /docker/config/ddclient:/config
+    restart: unless-stopped
