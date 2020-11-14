@@ -1,0 +1,47 @@
+version: '3'
+services:
+  portainer:
+    container_name: portainer_ce_https
+    image: portainer/portainer-ce
+    command: --ssl --sslcert /certs/live//cert.pem --sslkey /certs/live//privkey.pem
+    ports:
+      - 9000:9000
+      - 8000:8000
+    volumes:
+      - /docker/config/portainer:/data
+      - /docker/config/letsencrypt/archive/:/certs/archive/
+      - /docker/config/letsencrypt/live/:/certs/live/
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+  nginx:
+    container_name: nginx
+    image: linuxserver/nginx
+    environment:
+      - TZ=America/New_York
+      - PUID=1000
+      - PGID=1000
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - /docker/config/nginx:/config
+      - /docker/config/letsencrypt:/docker/config/letsencrypt
+    restart: unless-stopped
+  bitwarden_rs:
+    container_name: bw_rs
+    image: bitwardenrs/server
+    ports:
+      - 5080:80
+    environment:
+      #- ADMIN_TOKEN=
+      - ENABLE_DB_WAL=false
+      #- YUBICO_CLIENT_ID=
+      #- YUBICO_SECRET_KEY=
+      - RUST_BACKTRACE=1
+      - DATABASE_URL=mysql://bitwarden_rs:pw@mdb/bitwarden_rs
+      - LOG_FILE='/data/bitwarden.log'
+      - WEBSOCKET_ENABLED='true' # Required to use websockets
+      - SIGNUPS_ALLOWED='false'  # set to false to disable signups
+    volumes:
+      - /docker/config/bwdata:/data
+    restart: unless-stopped
