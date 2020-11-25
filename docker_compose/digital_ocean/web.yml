@@ -3,14 +3,14 @@ services:
   portainer:
     container_name: portainer_ce_https
     image: portainer/portainer-ce
-    command: --ssl --sslcert /certs/live//cert.pem --sslkey /certs/live//privkey.pem
+    command: --ssl --sslcert /certs/live/<domain>/cert.pem --sslkey /certs/live/<domain>/privkey.pem
     ports:
       - 9000:9000
       - 8000:8000
     volumes:
       - /docker/config/portainer:/data
-      - /docker/config/letsencrypt/archive/:/certs/archive/
-      - /docker/config/letsencrypt/live/:/certs/live/
+      - /docker/config/letsencrypt/archive/<domain>:/certs/archive/<domain>
+      - /docker/config/letsencrypt/live/<domain>:/certs/live/<domain>
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
   nginx:
